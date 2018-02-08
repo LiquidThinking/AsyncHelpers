@@ -14,5 +14,20 @@ namespace AsyncHelpers
             await Task.WhenAll( items );
             return items.Select( x => x.Result ).ToList();
         }
+        
+        /// <summary>
+        /// USAGE NOTE!!! The results will not be ordered
+        /// </summary>
+        /// <param name="list"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static AsyncEnumerable<T> ToAsyncEnumerable<T>( this IEnumerable<Task<T>> list )
+        {
+            var asyncEnumberable = new AsyncEnumerable<T>();
+
+            list.ToList().ForEach( t => { t.ContinueWith( r => asyncEnumberable.Add( t.Result ) ); } );
+
+            return asyncEnumberable;
+        }
     }
 }
